@@ -13,5 +13,6 @@ pkgs.mkShell {
   shellHook = ''
     mkdir -p .go
     export GOPATH=$PWD/.go
+    export PATH=$PWD/.go/bin:$PATH
   '';
 }
