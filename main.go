@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/getlantern/systray"
@@ -49,6 +51,9 @@ func (b *beats) playPause(url string) {
 		b.isPlaying = false
 	} else {
 		b.cmd = exec.Command("ffplay", url, "-nodisp")
+		if runtime.GOOS == "windows" {
+			b.cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
+		}
 		err := b.cmd.Start()
 
 		if err != nil {
