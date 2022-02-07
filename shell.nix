@@ -4,7 +4,7 @@ pkgs.mkShell {
   buildInputs = [
     pkgs.go
     pkgs.gopls
-    pkgs.mpv
+    pkgs.ffmpeg-full
     pkgs.pkg-config
     pkgs.gtk3
     pkgs.libappindicator-gtk3

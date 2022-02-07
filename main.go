@@ -25,21 +25,19 @@ func quit() {
 		log.Fatal(err)
 	}
 
-	children, err := pid.Children()
+	children, _ := pid.Children()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	if len(children) != 0 {
+		for _, c := range children {
+			err = c.Kill()
 
-	for _, c := range children {
-		err = c.Kill()
-
-		if err != nil {
-			log.Fatal(err)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
-	pid.Kill()
+	cmd.Process.Kill()
 }
 
 func playPause(url string) {
