@@ -15,11 +15,14 @@ import (
 
 //go:embed lofi.ico
 var icon []byte
-var cmd *exec.Cmd
-var isPlaying bool
 
-func quit() {
-	pid, err := process.NewProcess(int32(cmd.Process.Pid))
+type beats struct {
+	cmd       *exec.Cmd
+	isPlaying bool
+}
+
+func (b *beats) quit() {
+	pid, err := process.NewProcess(int32(b.cmd.Process.Pid))
 
 	if err != nil {
 		log.Fatal(err)
@@ -37,21 +40,21 @@ func quit() {
 		}
 	}
 
-	cmd.Process.Kill()
+	b.cmd.Process.Kill()
 }
 
-func playPause(url string) {
-	if isPlaying {
-		quit()
-		isPlaying = false
+func (b *beats) playPause(url string) {
+	if b.isPlaying {
+		b.quit()
+		b.isPlaying = false
 	} else {
-		cmd = exec.Command("ffplay", url, "-nodisp")
-		err := cmd.Start()
+		b.cmd = exec.Command("ffplay", url, "-nodisp")
+		err := b.cmd.Start()
 
 		if err != nil {
 			log.Fatal(err)
 		}
-		isPlaying = true
+		b.isPlaying = true
 	}
 }
 
@@ -96,7 +99,7 @@ func parseYT() (streamURL string) {
 	return streamURL
 }
 
-func onReady() {
+func (b *beats) onReady() {
 	systray.SetIcon(icon)
 	systray.SetTitle("lofibar")
 	systray.SetTooltip("pipe lofi beats audio from your menubar")
@@ -110,20 +113,19 @@ func onReady() {
 			select {
 			case <-mPlay.ClickedCh:
 				url := parseYT()
-				playPause(url)
+				b.playPause(url)
 			case <-mQuit.ClickedCh:
-				quit()
+				b.quit()
 				systray.Quit()
 			}
 		}
 	}()
 }
 
-func onExit() {
-	cmd.Process.Kill()
-}
+func (b *beats) onExit() {}
 
 func main() {
-	isPlaying = false
-	systray.Run(onReady, onExit)
+	b := beats{isPlaying: false}
+
+	systray.Run(b.onReady, b.onExit)
 }
