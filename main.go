@@ -10,6 +10,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/getlantern/systray"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 //go:embed lofi.ico
@@ -17,12 +18,36 @@ var icon []byte
 var cmd *exec.Cmd
 var isPlaying bool
 
+func quit() {
+	pid, err := process.NewProcess(int32(cmd.Process.Pid))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	children, err := pid.Children()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, c := range children {
+		err = c.Kill()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	pid.Kill()
+}
+
 func playPause(url string) {
 	if isPlaying {
-		cmd.Process.Kill()
+		quit()
 		isPlaying = false
 	} else {
-		cmd = exec.Command("ffmpeg", "-i", url, "-f", "pulse", "lofi")
+		cmd = exec.Command("ffplay", url, "-nodisp")
 		err := cmd.Start()
 
 		if err != nil {
@@ -76,18 +101,20 @@ func parseYT() (streamURL string) {
 func onReady() {
 	systray.SetIcon(icon)
 	systray.SetTitle("lofibar")
-	systray.SetTooltip("pipe youtube audio from your menubar")
+	systray.SetTooltip("pipe lofi beats audio from your menubar")
 
 	go func() {
 		mPlay := systray.AddMenuItem("Play/Pause", "play/pause")
 		systray.AddSeparator()
 		mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+
 		for {
 			select {
 			case <-mPlay.ClickedCh:
 				url := parseYT()
 				playPause(url)
 			case <-mQuit.ClickedCh:
+				quit()
 				systray.Quit()
 			}
 		}
