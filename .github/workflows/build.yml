@@ -1,0 +1,75 @@
+name: build binary
+
+on: [push]
+
+env:
+  go_version: "^1.17.1"
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.go_version }}
+
+    - name: get deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install gcc libgtk-3-dev libappindicator3-dev
+
+    - name: build binary
+      run: go build
+
+    - name: zip
+      run: zip lofibar.zip lofibar
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: lofibar-linux
+        path: ./lofibar.zip
+
+  mac:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.go_version }}
+
+    - name: build binary
+      run: go build
+
+    - name: zip
+      run: zip lofibar.zip lofibar
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: lofibar-mac
+        path: ./lofibar.zip
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.go_version }}
+
+    - name: build binary
+      run: go build -ldflags "-H=windowsgui"
+
+    - name: zip exe
+      run: Compress-Archive -Path .\lofibar.exe -DestinationPath .\lofibar.zip
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: lofibar-win
+        path: ./lofibar.zip

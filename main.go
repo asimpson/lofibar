@@ -86,13 +86,12 @@ func parseYT() (streamURL string) {
 
 func (b *beats) onReady() {
 	systray.SetIcon(icon)
-	systray.SetTitle("lofibar")
-	systray.SetTooltip("pipe lofi beats audio from your menubar")
+	systray.SetTooltip("pipe lofi beats from the menubar")
 
 	go func() {
 		mPlay := systray.AddMenuItem("Play/Pause", "play/pause")
 		systray.AddSeparator()
-		mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+		mQuit := systray.AddMenuItem("Quit", "Quit")
 
 		for {
 			select {
