@@ -6,9 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/getlantern/systray"
@@ -43,24 +41,6 @@ func (b *beats) quit() {
 	}
 
 	b.cmd.Process.Kill()
-}
-
-func (b *beats) playPause(url string) {
-	if b.isPlaying {
-		b.quit()
-		b.isPlaying = false
-	} else {
-		b.cmd = exec.Command("ffplay", url, "-nodisp")
-		if runtime.GOOS == "windows" {
-			b.cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
-		}
-		err := b.cmd.Start()
-
-		if err != nil {
-			log.Fatal(err)
-		}
-		b.isPlaying = true
-	}
 }
 
 func parseYT() (streamURL string) {
@@ -118,7 +98,7 @@ func (b *beats) onReady() {
 			select {
 			case <-mPlay.ClickedCh:
 				url := parseYT()
-				b.playPause(url)
+				b.PlayPause(url)
 			case <-mQuit.ClickedCh:
 				b.quit()
 				systray.Quit()
