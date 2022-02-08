@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-func (b *beats) PlayPause(url string) {
+func (b *beats) playPause(url string) {
 	if b.isPlaying {
 		b.quit()
 		b.isPlaying = false

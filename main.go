@@ -98,7 +98,7 @@ func (b *beats) onReady() {
 			select {
 			case <-mPlay.ClickedCh:
 				url := parseYT()
-				b.PlayPause(url)
+				b.playPause(url)
 			case <-mQuit.ClickedCh:
 				b.quit()
 				systray.Quit()
