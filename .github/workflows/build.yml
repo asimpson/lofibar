@@ -1,9 +1,13 @@
 name: build binary
 
-on: [push]
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
 
 env:
   go_version: "^1.17.1"
+  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 jobs:
   linux:
@@ -25,12 +29,10 @@ jobs:
       run: go build
 
     - name: zip
-      run: zip lofibar.zip lofibar
+      run: zip lofibar-linux.zip lofibar
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: lofibar-linux
-        path: ./lofibar.zip
+    - name: upload to release
+      run: gh release upload ${{ github.ref_name }} lofibar-linux.zip
 
   mac:
     runs-on: macos-latest
@@ -46,12 +48,10 @@ jobs:
       run: go build
 
     - name: zip
-      run: zip lofibar.zip lofibar
+      run: zip lofibar-mac.zip lofibar
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: lofibar-mac
-        path: ./lofibar.zip
+    - name: upload to release
+      run: gh release upload ${{ github.ref_name }} lofibar-mac.zip
 
   windows:
     runs-on: windows-latest
@@ -67,9 +67,7 @@ jobs:
       run: go build -ldflags "-H=windowsgui"
 
     - name: zip exe
-      run: Compress-Archive -Path .\lofibar.exe -DestinationPath .\lofibar.zip
+      run: Compress-Archive -Path .\lofibar.exe -DestinationPath .\lofibar-windows.zip
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: lofibar-win
-        path: ./lofibar.zip
+    - name: upload to release
+      run: gh release upload ${{ github.ref_name }} lofibar-windows.zip
