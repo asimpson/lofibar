@@ -3,6 +3,7 @@
 pkgs.mkShell {
   buildInputs = [
     pkgs.go
+    pkgs.gh
     pkgs.gopls
     pkgs.ffmpeg-full
     pkgs.pkg-config
