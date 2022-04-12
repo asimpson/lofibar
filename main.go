@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -109,6 +110,9 @@ func (b *beats) onReady() {
 func (b *beats) onExit() {}
 
 func main() {
+	p := os.Getenv("PATH")
+	os.Setenv("PATH","/usr/local/bin:/opt/homebrew/bin:"+p)
+
 	b := beats{isPlaying: false}
 
 	systray.Run(b.onReady, b.onExit)
