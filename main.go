@@ -52,7 +52,7 @@ func parseYT() (streamURL string) {
 		}
 	}
 
-	resp, err := http.Get("https://www.youtube.com/watch?v=5qap5aO4i9A")
+	resp, err := http.Get("https://www.youtube.com/watch?v=jfKfPfyJRdk")
 
 	if err != nil {
 		log.Fatal(err)
